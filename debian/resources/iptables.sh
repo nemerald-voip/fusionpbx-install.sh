@@ -64,6 +64,17 @@ iptables -P INPUT DROP
 iptables -P FORWARD DROP
 iptables -P OUTPUT ACCEPT
 
+#Allow connection from Thinq:
+iptables -A INPUT -p udp --dport 35000 -s 192.81.236.20/32 -j ACCEPT
+iptables -A INPUT -p udp --dport 35000 -s 192.81.237.20/32 -j ACCEPT
+
+#Allow connection from Peerless:
+iptables -A INPUT -p udp --dport 35000 -s 207.223.73.201/32 -j ACCEPT
+iptables -A INPUT -p udp --dport 35000 -s 208.51.154.71/32 -j ACCEPT
+iptables -A INPUT -p udp --dport 35000 -s 207.223.71.227/32 -j ACCEPT
+iptables -A INPUT -p udp --dport 35000 -s 208.79.55.168/32 -j ACCEPT
+iptables -A INPUT -p udp --dport 35000 -s 208.93.43.141/32 -j ACCEPT
+
 #answer the questions for iptables persistent
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
 echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
