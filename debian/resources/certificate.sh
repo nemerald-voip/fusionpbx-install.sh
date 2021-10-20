@@ -25,3 +25,28 @@
 
 	#set the permissions
 	chown -R www-data:www-data /etc/freeswitch/tls
+	
+	
+	
+#combine the certs into all.pem
+cat la01.pem > /etc/freeswitch/tls/all.pem
+cat chain.pem >> /etc/freeswitch/tls/all.pem
+cat private.csr >> /etc/freeswitch/tls/all.pem
+
+#copy the certificates
+cp la01.pem /etc/freeswitch/tls/cert.pem
+cp chain.pem /etc/freeswitch/tls/chain.pem
+cat la01.pem > /etc/freeswitch/tls/fullchain.pem
+cat chain.pem >> /etc/freeswitch/tls/fullchain.pem
+cp private.csr /etc/freeswitch/tls/privkey.pem
+
+#add symbolic links
+ln -s /etc/freeswitch/tls/all.pem /etc/freeswitch/tls/agent.pem
+ln -s /etc/freeswitch/tls/all.pem /etc/freeswitch/tls/tls.pem
+ln -s /etc/freeswitch/tls/all.pem /etc/freeswitch/tls/wss.pem
+ln -s /etc/freeswitch/tls/all.pem /etc/freeswitch/tls/dtls-srtp.pem
+
+#set the permissions
+chown -R www-data:www-data /etc/freeswitch/tls
+
+fs_cli -x "reload mod_sofia"
