@@ -75,6 +75,10 @@ iptables -A INPUT -p udp --dport 35000 -s 207.223.71.227/32 -j ACCEPT
 iptables -A INPUT -p udp --dport 35000 -s 208.79.55.168/32 -j ACCEPT
 iptables -A INPUT -p udp --dport 35000 -s 208.93.43.141/32 -j ACCEPT
 
+#Allow connection from API server:
+iptables -A INPUT -p tcp --dport 5432 -s 54.218.160.40/32 -j ACCEPT
+
+
 #answer the questions for iptables persistent
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
 echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
