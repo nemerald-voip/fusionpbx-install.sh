@@ -9,13 +9,15 @@ system_branch=master            # master, stable
 switch_branch=stable            # master, stable
 switch_source=true              # true or false
 switch_package=false            # true or false
-switch_version=1.10.7           # only for source
+switch_version=1.10.8           # only for source
 switch_tls=true                 # true or false
 
 # Sofia-Sip Settings
-sofia_version=1.13.6            # release-version for sofia-sip to use
+sofia_version=1.13.8            # release-version for sofia-sip to use
 
 # Database Settings
+database_name=fusionpbx         # Database name (safe characters A-Z, a-z, 0-9)
+database_username=fusionpbx     # Database username (safe characters A-Z, a-z, 0-9)
 database_password=random        # random or a custom value (safe characters A-Z, a-z, 0-9)
 database_repo=system            # PostgreSQL official, system, 2ndquadrant
 database_version=13             # requires repo official

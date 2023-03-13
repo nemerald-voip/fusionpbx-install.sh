@@ -15,7 +15,7 @@ apt install -y autoconf automake devscripts g++ git-core libncurses5-dev libtool
   liblua5.2-dev libtiff5-dev libperl-dev libcurl4-openssl-dev libsqlite3-dev libpcre3-dev \
   devscripts libspeexdsp-dev libspeex-dev libldns-dev libedit-dev libopus-dev libmemcached-dev \
   libshout3-dev libmpg123-dev libmp3lame-dev yasm nasm libsndfile1-dev libuv1-dev libvpx-dev \
-  libavformat-dev libswscale-dev libspandsp-dev pip libpq-dev libvlc-dev
+  libavformat-dev libswscale-dev libspandsp-dev pip libpq-dev libvlc-dev uuid-dev sox
 
 # additional dependencies
 apt install -y swig3.0 unzip sox wget
@@ -103,17 +103,7 @@ sed -i /usr/src/freeswitch/modules.conf -e s:'applications/mod_signalwire:#appli
 
 # compile and install
 make
-
-rm -rf /usr/share/freeswitch/sounds/music/default
-
 make install
-make sounds-install moh-install
-make hd-sounds-install hd-moh-install
-make cd-sounds-install cd-moh-install
-
-#move the music into music/default directory
-mkdir -p /usr/share/freeswitch/sounds/music/default
-mv /usr/share/freeswitch/sounds/music/*000 /usr/share/freeswitch/sounds/music/default
 
 #return to the executing directory
 cd $CWD

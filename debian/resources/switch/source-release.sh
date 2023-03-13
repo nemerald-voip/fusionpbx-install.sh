@@ -16,7 +16,7 @@ apt install -y pkg-config flac  libgdbm-dev libdb-dev gettext sudo equivs mlocat
 apt install -y liblua5.2-dev libtiff5-dev libperl-dev libcurl4-openssl-dev libsqlite3-dev libpcre3-dev
 apt install -y devscripts libspeexdsp-dev libspeex-dev libldns-dev libedit-dev libopus-dev libmemcached-dev
 apt install -y libshout3-dev libmpg123-dev libmp3lame-dev yasm nasm libsndfile1-dev libuv1-dev libvpx-dev
-apt install -y libavformat-dev libswscale-dev libvlc-dev python3-distutils
+apt install -y libavformat-dev libswscale-dev libvlc-dev python3-distutils sox
 
 #install dependencies that depend on the operating system version
 if [ ."$os_codename" = ."stretch" ]; then
@@ -108,7 +108,7 @@ if [ $switch_branch = "stable" ]; then
 		mv freeswitch-$switch_version.-release freeswitch
 		cd /usr/src/freeswitch
 		#apply patch
-		patch -u /usr/src/freeswitch/src/mod/databases/mod_pgsql/mod_pgsql.c -i /usr/src/fusionpbx-install.sh/debian/resources/switch/source/mod_pgsql.patch
+		#patch -u /usr/src/freeswitch/src/mod/databases/mod_pgsql/mod_pgsql.c -i /usr/src/fusionpbx-install.sh/debian/resources/switch/source/mod_pgsql.patch
 	fi
 fi
 
@@ -139,13 +139,6 @@ sed -i /usr/src/freeswitch/modules.conf -e s:'endpoints/mod_verto:#endpoints/mod
 # compile and install
 make
 make install
-make sounds-install moh-install
-make hd-sounds-install hd-moh-install
-make cd-sounds-install cd-moh-install
-
-#move the music into music/default directory
-mkdir -p /usr/share/freeswitch/sounds/music/default
-mv /usr/share/freeswitch/sounds/music/*000 /usr/share/freeswitch/sounds/music/default
 
 #return to the executing directory
 cd $CWD
