@@ -3,17 +3,17 @@
 domain_name=ip_address          # hostname, ip_address or a custom value
 system_username=admin           # default username admin
 system_password=random          # random or a custom value
-system_branch=master            # master, stable
+system_branch=5.1               # master, 5.1
 
 # FreeSWITCH Settings
 switch_branch=stable            # master, stable
 switch_source=true              # true or false
 switch_package=false            # true or false
-switch_version=1.10.8           # only for source
+switch_version=1.10.9           # only for source
 switch_tls=true                 # true or false
 
 # Sofia-Sip Settings
-sofia_version=1.13.8            # release-version for sofia-sip to use
+sofia_version=1.13.13            # release-version for sofia-sip to use
 
 # Database Settings
 database_name=fusionpbx         # Database name (safe characters A-Z, a-z, 0-9)

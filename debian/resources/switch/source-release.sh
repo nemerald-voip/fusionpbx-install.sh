@@ -46,7 +46,7 @@ if [ $(echo "$switch_version" | tr -d '.') -gt 1100 ]; then
 	git clone https://github.com/signalwire/libks.git libks
 	cd libks
 	cmake .
-	make
+	make -j $(getconf _NPROCESSORS_ONLN)
 	make install
 
 	# libks C includes
@@ -62,16 +62,18 @@ if [ $(echo "$switch_version" | tr -d '.') -gt 1100 ]; then
 	cd sofia-sip
 	sh autogen.sh
 	./configure
-	make
+	make -j $(getconf _NPROCESSORS_ONLN)
 	make install
 
 	# spandsp
 	cd /usr/src
 	git clone https://github.com/freeswitch/spandsp.git spandsp
 	cd spandsp
+ 	git reset --hard 0d2e6ac65e0e8f53d652665a743015a88bf048d4
+ 	#/usr/bin/sed -i 's/AC_PREREQ(\[2\.71\])/AC_PREREQ([2.69])/g' /usr/src/spandsp/configure.ac
 	sh autogen.sh
 	./configure
-	make
+	make -j $(getconf _NPROCESSORS_ONLN)
 	make install
 	ldconfig
 fi
@@ -120,6 +122,7 @@ sed -i /usr/src/freeswitch/modules.conf -e s:'#applications/mod_cidlookup:applic
 sed -i /usr/src/freeswitch/modules.conf -e s:'#applications/mod_memcache:applications/mod_memcache:'
 sed -i /usr/src/freeswitch/modules.conf -e s:'#applications/mod_nibblebill:applications/mod_nibblebill:'
 sed -i /usr/src/freeswitch/modules.conf -e s:'#applications/mod_curl:applications/mod_curl:'
+sed -i /usr/src/freeswitch/modules.conf -e s:'#applications/mod_translate:applications/mod_translate:'
 sed -i /usr/src/freeswitch/modules.conf -e s:'#formats/mod_shout:formats/mod_shout:'
 sed -i /usr/src/freeswitch/modules.conf -e s:'#formats/mod_pgsql:formats/mod_pgsql:'
 sed -i /usr/src/freeswitch/modules.conf -e s:'#say/mod_say_es:say/mod_say_es:'
@@ -137,7 +140,7 @@ sed -i /usr/src/freeswitch/modules.conf -e s:'endpoints/mod_verto:#endpoints/mod
 --with-openssl --enable-core-pgsql-support
 
 # compile and install
-make
+make -j $(getconf _NPROCESSORS_ONLN)
 make install
 
 #return to the executing directory

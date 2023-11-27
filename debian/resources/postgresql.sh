@@ -28,34 +28,16 @@ fi
 
 #postgres official repository
 if [ ."$database_repo" = ."official" ]; then
-	if [ ."$os_codename" = ."jessie" ]; then
-		echo "deb http://apt.postgresql.org/pub/repos/apt/ $os_codename-pgdg main" > /etc/apt/sources.list.d/postgresql.list
-		wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-		apt-get update && apt-get upgrade -y
-	fi
-	if [ ."$os_codename" = ."stretch" ]; then
-		echo "deb http://apt.postgresql.org/pub/repos/apt/ $os_codename-pgdg main" > /etc/apt/sources.list.d/postgresql.list
-		wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-		apt-get update && apt-get upgrade -y
-	fi
-	if [ ."$os_codename" = ."buster" ]; then
-		echo "deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main" > /etc/apt/sources.list.d/postgresql.list
-		wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-	fi
-	if [ ."$os_codename" = ."bullseye" ]; then
-		echo "deb http://apt.postgresql.org/pub/repos/apt/ bullseye-pgdg main" > /etc/apt/sources.list.d/postgresql.list
-		wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-	fi
+	sh -c 'echo "deb [signed-by=/etc/apt/trusted.gpg.d/pgdg.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+	wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /etc/apt/trusted.gpg.d/pgdg.gpg
+	chmod 644 /etc/apt/trusted.gpg.d/pgdg.gpg
+	apt-get update && apt-get upgrade -y
 	if [ ."$database_host" = ."127.0.0.1" ] || [ ."$database_host" = ."::1" ] ; then
 		if [ ."$database_version" = ."latest" ]; then
 			apt-get install -y sudo postgresql
-		fi
-		if [ ."$database_version" = ."9.6" ]; then
-			apt-get install -y sudo postgresql-$database_version
-		fi
-		if [ ."$database_version" = ."9.4" ]; then
-			apt-get install -y sudo postgresql-$database_version
-		fi
+                else
+                        apt-get install -y sudo postgresql-$database_version
+                fi
 	else
 		apt-get install -y sudo postgresql-client
 	fi
@@ -77,6 +59,20 @@ if [ ."$database_repo" = ."2ndquadrant" ]; then
 	fi
 fi
 
+#install the database backup
+#cp backup/fusionpbx-backup /etc/cron.daily
+#cp backup/fusionpbx-maintenance /etc/cron.daily
+#chmod 755 /etc/cron.daily/fusionpbx-backup
+#chmod 755 /etc/cron.daily/fusionpbx-maintenance
+#sed -i "s/zzz/$password/g" /etc/cron.daily/fusionpbx-backup
+#sed -i "s/zzz/$password/g" /etc/cron.daily/fusionpbx-maintenance
+
+#initialize the database
+pg_createcluster $database_version main
+
+#replace scram-sha-256 with md5
+sed -i /etc/postgresql/$database_version/main/pg_hba.conf -e '/^#/!s/scram-sha-256/md5/g'
+
 #systemd
 if [ ."$database_host" = ."127.0.0.1" ] || [ ."$database_host" = ."::1" ] ; then
 	systemctl daemon-reload
@@ -86,19 +82,14 @@ fi
 #init.d
 #/usr/sbin/service postgresql restart
 
-#install the database backup
-#cp backup/fusionpbx-backup /etc/cron.daily
-#cp backup/fusionpbx-maintenance /etc/cron.daily
-#chmod 755 /etc/cron.daily/fusionpbx-backup
-#chmod 755 /etc/cron.daily/fusionpbx-maintenance
-#sed -i "s/zzz/$password/g" /etc/cron.daily/fusionpbx-backup
-#sed -i "s/zzz/$password/g" /etc/cron.daily/fusionpbx-maintenance
-
 #move to /tmp to prevent a red herring error when running sudo with psql
 cwd=$(pwd)
 cd /tmp
 
 if [ ."$database_host" = ."127.0.0.1" ] || [ ."$database_host" = ."::1" ] ; then
+	#reload the config
+  	sudo -u postgres psql -c "SELECT pg_reload_conf();"
+
 	# add the databases, users and grant permissions to them
 	sudo -u postgres psql -c "CREATE DATABASE fusionpbx;";
 	sudo -u postgres psql -c "CREATE DATABASE freeswitch;";

@@ -58,7 +58,7 @@ domain_uuid=$(/usr/bin/php /var/www/fusionpbx/resources/uuid.php);
 psql --host=$database_host --port=$database_port --username=$database_username -c "insert into v_domains (domain_uuid, domain_name, domain_enabled) values('$domain_uuid', '$domain_name', 'true');"
 
 #app defaults
-cd /var/www/fusionpbx && php /var/www/fusionpbx/core/upgrade/upgrade_domains.php
+cd /var/www/fusionpbx && /usr/bin/php /var/www/fusionpbx/core/upgrade/upgrade_domains.php
 
 #add the user
 user_uuid=$(/usr/bin/php /var/www/fusionpbx/resources/uuid.php);
@@ -69,7 +69,7 @@ if [ .$system_password = .'random' ]; then
 else
 	user_password=$system_password
 fi
-password_hash=$(php -r "echo md5('$user_salt$user_password');");
+password_hash=$(/usr/bin/php -r "echo md5('$user_salt$user_password');");
 psql --host=$database_host --port=$database_port --username=$database_username -t -c "insert into v_users (user_uuid, domain_uuid, username, password, salt, user_enabled) values('$user_uuid', '$domain_uuid', '$user_name', '$password_hash', '$user_salt', 'true');"
 
 #get the superadmin group_uuid
@@ -92,7 +92,7 @@ sed -i /etc/freeswitch/autoload_configs/xml_cdr.conf.xml -e s:"{v_user}:$xml_cdr
 sed -i /etc/freeswitch/autoload_configs/xml_cdr.conf.xml -e s:"{v_pass}:$xml_cdr_password:"
 
 #app defaults
-cd /var/www/fusionpbx && php /var/www/fusionpbx/core/upgrade/upgrade.php
+cd /var/www/fusionpbx && /usr/bin/php /var/www/fusionpbx/core/upgrade/upgrade.php
 
 #restart freeswitch
 /bin/systemctl daemon-reload
@@ -109,6 +109,9 @@ cp /var/www/fusionpbx/app/event_guard/resources/service/debian.service /etc/syst
 /bin/systemctl enable event_guard
 /bin/systemctl start event_guard
 /bin/systemctl daemon-reload
+
+#add xml cdr import to crontab
+(crontab -l; echo "* * * * * $(which php) /var/www/fusionpbx/app/xml_cdr/xml_cdr_import.php 300") | crontab
 
 #welcome message
 echo ""
